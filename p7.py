@@ -1,55 +1,39 @@
-n = int( input("enter number of processes : ") )
-processes = [ ]
+def FCFS(requests, initial_position):
+    seek_count = 0
+    current_position = initial_position
 
-for i in range(n):
-    print(f"\nProcess {i+1}")
-    p = []
-    p.append( i+1 )
-    p.append( int( input("Enter Arrival Time : ") ) )
-    p.append( int( input("Enter Burst Time : ") ) )
-    p.append(p[2])
-    p.append( int( input("Enter Priority : ") ) )
-    processes.append(p)
+    for request in requests:
+        seek_count += abs(current_position - request) 
+        current_position = request
 
-processes.sort(key= lambda x:x[1])
+    return requests, seek_count
 
-time = 0
-compeleted = 0
-queue = []
-chart = []
-while compeleted < n : 
-    for p in processes:
-        if(p not in queue and p[3]>0 and p[1]<=time):
-            queue.append(p)
-    
-    if not queue:
-        time+=1
-        continue
-    queue.sort(key= lambda x:x[4])
-    p = queue.pop(0)
-    p[3]-= p[2]
-    p.append(time-p[1]+p[2])
-    p.append(p[5]-p[2])
-    chart.append([p[0], time, time+p[2]])
-    time+=p[2]
-    compeleted+=1
+def SSTF(requests, initial_position):
+    seek_count = 0
+    current_position = initial_position
+    seek_sequence = []
+    remaining_requests = requests[:]
 
+    while remaining_requests:
+        distances = [abs(current_position - request) for request in remaining_requests]
+        
+        shortest_seek_time_index = distances.index(min(distances))
+        nearest_request = remaining_requests.pop(shortest_seek_time_index)
+        
+        seek_count += abs(current_position - nearest_request)  
+        seek_sequence.append(nearest_request)
+        current_position = nearest_request
 
-print("\nGantt Chart")
+    return seek_sequence, seek_count
 
-for p in chart:
-    print(f'|   P{p[0]:<2} [{p[1]}-{p[2]}]  ',end="")
-print("|")
+requests = [55, 58, 60, 98, 140, 180, 25, 40, 80, 120]
+initial_position = 50
+
+seek_sequence, total_seek_count = SSTF(requests, initial_position)
+print("SSTF Seek Sequence:", seek_sequence)
+print("Total Seek Count:", total_seek_count)
 
 
-total_wait = 0
-total_turnaround = 0
-
-print(f'\nProcess   |Arrival Time   |Burst Time   |Priority  |Turnaround Time  |Waiting Time  ')
-for p in processes:
-    print(f'P{p[0]:<9}|{p[1]:<15}|{p[2]:<13}|{p[4]:<10}|{p[5]:<17}|{p[6]}')
-    total_wait += p[6]
-    total_turnaround += p[5]
-
-print(f"\nAverage Waiting Time {total_wait/n}")
-print(f"Average TurnAround Time {total_turnaround/n}")
+seek_sequence, total_seek_count = FCFS(requests, initial_position)
+print("FCFS Seek Sequence:", seek_sequence)
+print("Total Seek Count:", total_seek_count)
