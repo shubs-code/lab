@@ -19,20 +19,25 @@ queue = []
 chart = []
 while compeleted < n : 
     for p in processes:
-        if(p not in queue and p[3]>0 and p[1]<=time):
+        if(p[1]==time):
             queue.append(p)
     
+    time+=1
     if not queue:
-        time+=1
         continue
+    
     queue.sort(key= lambda x:x[4])
     p = queue.pop(0)
-    p[3]-= p[2]
-    p.append(time-p[1]+p[2])
-    p.append(p[5]-p[2])
-    chart.append([p[0], time, time+p[2]])
-    time+=p[2]
-    compeleted+=1
+    p[3]-= 1
+
+    chart.append([p[0], time-1, time])
+
+    if p[3]==0:
+        p.append(time-p[1])
+        p.append(p[5]-p[2])
+        compeleted+=1
+    else:
+        queue.insert(0,p)
 
 
 print("\nGantt Chart")
